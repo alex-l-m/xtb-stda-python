@@ -1,3 +1,4 @@
+import re
 import sys
 from random import choices
 from string import ascii_letters
@@ -93,3 +94,19 @@ def wavefunction_stda(xtb_path):
     rmdir(temp_dir_name)
 
     return out_text
+
+# Copied from my script iridium_xtb_test/log2energy.py
+def log2energy(stda_log):
+    '''From an stda log as a string, extract and return the excitation energy
+    to the lowest excited state as a number, in eV'''
+    right_part = False
+    for line in stda_log.split("\n"):
+        match_string = r"\s*1\s*([.0-9]*)"
+        # Section heading
+        if "excitation energies, transition moments and TDA amplitudes" in line:
+            right_part = True
+        if line.strip() == "":
+            right_part = False
+        energy_match = re.match(match_string, line)
+        if right_part and energy_match is not None:
+            return float(energy_match.group(1))
