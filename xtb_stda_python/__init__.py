@@ -42,7 +42,7 @@ def save_wavefunction(mol, outpath):
 
     # Save xyz file
     xyz_path = join(temp_dir_name, "mol.xyz")
-    write(mol, xyz_path)
+    write(xyz_path, mol)
 
     # Set working directory to target folder and run
     run(["xtb4stda", "-parx", param_x_path, "-parv", param_v_path],
