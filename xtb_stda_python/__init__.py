@@ -81,7 +81,7 @@ def wavefunction_stda(xtb_path):
 
     # Run stda
     stda_run = run(["stda", "-xtb"], capture_output = True, cwd =
-                   temp_dir_name, check = True)
+                   temp_dir_name, check = True, text = True)
 
     # Retrieve text printed by the stda program
     out_text = stda_run.stdout
