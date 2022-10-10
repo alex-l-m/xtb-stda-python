@@ -49,7 +49,8 @@ def save_wavefunction(mol, outpath):
         cwd = temp_dir_name, check = True)
 
     # Copy wavefunction file to target path
-    replace("wfn.xtb", outpath)
+    temp_wavefunction_path = join(temp_dir_name, "wfn.xtb")
+    replace(temp_wavefunction_path, outpath)
 
     # Cleanup
     for temp_file_name in possible_files_xtb:
