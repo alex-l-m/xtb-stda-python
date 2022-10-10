@@ -45,7 +45,7 @@ def save_wavefunction(mol, outpath):
     write(xyz_path, mol)
 
     # Set working directory to target folder and run
-    run(["xtb4stda", "mol.xyz", "-parx", param_x_path, "-parv", param_v_path],
+    run(["xtb4stda", "mol.xyz", "-parx", "param_x.xtb", "-parv", "param_v.xtb"],
         cwd = temp_dir_name, check = True)
 
     # Copy wavefunction file to target path
