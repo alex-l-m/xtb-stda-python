@@ -65,7 +65,7 @@ def save_wavefunction(mol, outpath):
     # should be no error from rmdir
     rmdir(temp_dir_name)
 
-def wavefunction_stda(xtb_path):
+def wavefunction_stda(xtb_path, triplet = False):
     '''Given a path to an XTB wavefunction created by xtb4stda, run stda and
     return the output as a string'''
 
@@ -79,8 +79,14 @@ def wavefunction_stda(xtb_path):
     copied_xtb_path = join(temp_dir_name, "wfn.xtb")
     copy(xtb_path, copied_xtb_path)
 
+    # Add extra flags to the subprocess command based on the optional function
+    # parameters
+    extra_flags = []
+    if triplet:
+        extra_flags.append("-t")
+
     # Run stda
-    stda_run = run(["stda", "-xtb"], capture_output = True, cwd =
+    stda_run = run(["stda", "-xtb"] + extra_flags, capture_output = True, cwd =
                    temp_dir_name, check = True, text = True)
 
     # Retrieve text printed by the stda program
