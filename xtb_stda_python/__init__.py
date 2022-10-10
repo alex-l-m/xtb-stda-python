@@ -92,7 +92,6 @@ def wavefunction_stda(xtb_path):
         temp_file_path = join(temp_dir_name, temp_file_name)
         if isfile(temp_file_path):
             remove(temp_file_path)
-    remove(copied_xtb_path)
     # After removing the input file and every possible output file, should be
     # clear to remove the directory
     rmdir(temp_dir_name)
