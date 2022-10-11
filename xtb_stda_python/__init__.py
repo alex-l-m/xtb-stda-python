@@ -65,7 +65,7 @@ def save_wavefunction(mol, outpath):
     # should be no error from rmdir
     rmdir(temp_dir_name)
 
-def wavefunction_stda(xtb_path, triplet = False):
+def wavefunction_stda(xtb_path, dat_path = None, triplet = False):
     '''Given a path to an XTB wavefunction created by xtb4stda, run stda and
     return the output as a string'''
 
@@ -91,6 +91,11 @@ def wavefunction_stda(xtb_path, triplet = False):
 
     # Retrieve text printed by the stda program
     out_text = stda_run.stdout
+
+    # If we're keeping the dat file in order to make a spectrum with g_spec,
+    # copy it to the given path
+    if dat_path is not None:
+        copy(join(temp_dir_name, "tda.dat"), dat_path)
 
     # Cleanup
     remove(copied_xtb_path)
