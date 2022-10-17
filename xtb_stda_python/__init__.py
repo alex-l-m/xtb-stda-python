@@ -2,7 +2,7 @@ import re
 import sys
 from random import choices
 from string import ascii_letters
-from os import mkdir, rmdir, remove, replace
+from os import mkdir, rmdir, remove, replace, environ
 from os.path import join, isfile
 from subprocess import run
 from shutil import copy
@@ -28,7 +28,8 @@ default_param_x_text = open(join(__path__[0], "param_x_template.txt")).read()
 
 def save_wavefunction(mol, outpath,
                       param_x_text = default_param_x_text,
-                      param_v_text = default_param_v_text):
+                      param_v_text = default_param_v_text,
+                      nthreads = None):
     '''Given an ASE molecule, save an XTB wavefunction to the given directory,
     computed using xtb4stda'''
 
@@ -46,9 +47,14 @@ def save_wavefunction(mol, outpath,
     xyz_path = join(temp_dir_name, "mol.xyz")
     write(xyz_path, mol)
 
+    # Set environment variables
+    env = environ.copy()
+    if nthreads is not None:
+        env["OMP_NUM_THREADS"] = nthreads
+        env["MKL_NUM_THREADS"] = nthreads
     # Set working directory to target folder and run
     run(["xtb4stda", "mol.xyz", "-parx", "param_x.xtb", "-parv", "param_v.xtb"],
-        cwd = temp_dir_name, check = True)
+        cwd = temp_dir_name, check = True, env = env)
 
     # Copy wavefunction file to target path
     temp_wavefunction_path = join(temp_dir_name, "wfn.xtb")
@@ -67,7 +73,7 @@ def save_wavefunction(mol, outpath,
     # should be no error from rmdir
     rmdir(temp_dir_name)
 
-def wavefunction_stda(xtb_path, dat_path = None, triplet = False):
+def wavefunction_stda(xtb_path, dat_path = None, triplet = False, nthreads = None):
     '''Given a path to an XTB wavefunction created by xtb4stda, run stda and
     return the output as a string'''
 
@@ -87,9 +93,15 @@ def wavefunction_stda(xtb_path, dat_path = None, triplet = False):
     if triplet:
         extra_flags.append("-t")
 
+    # Set environment variables
+    env = environ.copy()
+    if nthreads is not None:
+        env["OMP_NUM_THREADS"] = nthreads
+        env["MKL_NUM_THREADS"] = nthreads
+
     # Run stda
     stda_run = run(["stda", "-xtb"] + extra_flags, capture_output = True, cwd =
-                   temp_dir_name, check = True, text = True)
+                   temp_dir_name, check = True, text = True, env = env)
 
     # Retrieve text printed by the stda program
     out_text = stda_run.stdout
