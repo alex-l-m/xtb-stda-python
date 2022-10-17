@@ -161,6 +161,21 @@ def mol2energy(mol,
     # Energy
     return log2energy(stda_log)
 
+class Mol2EnergyClosure:
+    def __init__(self, 
+               # xtb4stda arguments
+               param_x_text = default_param_x_text,
+               param_v_text = default_param_v_text,
+               # stda arguments
+               triplet = False):
+        self.param_x_text = param_x_text
+        self.param_v_text = param_v_text
+        self.triplet = triplet
+    
+    def __call__(self, mol):
+        return mol2energy(mol, param_x_text = self.param_x_text, param_v_text =
+        self.param_v_text, triplet = self.triplet, nthreads = 1)
+
 def mols2energy(mols,
                # xtb4stda arguments
                param_x_text = default_param_x_text,
@@ -169,11 +184,10 @@ def mols2energy(mols,
                triplet = False):
     '''Given a list of ASE molecules, run xtb-stda on them in parallel, and
     return a list of excitation energies'''
-    # Defining the closure with def because I get an error that it can't pickle
-    # if I use an anonymous function
-    def closure(mol):
-        return mol2energy(mol, nthreads = 1, param_x_text = param_x_text,
-                          param_v_text = param_v_text, triplet = triplet)
+    closure = Mol2EnergyClosure(
+               param_x_text = param_x_text,
+               param_v_text = param_v_text,
+               triplet = triplet)
     with ProcessPoolExecutor() as pool:
         # Without calling "list", I get a generator
         energies = list(pool.map(closure, mols))
