@@ -23,10 +23,12 @@ possible_files_stda = ["TmPvEcInFo", "qia", "zmint", "xlint", "beta_HRS",
                        "xvint", "NTOao", ".STDA", "tda.exc", "ylint", "ymint",
                        ".OUT", "amb", "wavelength", "wfn.xtb", "fnorm", "sint",
                        "2PA-abs", ".ref", "apbmat", "pia", "jmol.spt"]
-param_v_text = open(join(__path__[0], "param_v_template.txt")).read()
-param_x_text = open(join(__path__[0], "param_x_template.txt")).read()
+default_param_v_text = open(join(__path__[0], "param_v_template.txt")).read()
+default_param_x_text = open(join(__path__[0], "param_x_template.txt")).read()
 
-def save_wavefunction(mol, outpath):
+def save_wavefunction(mol, outpath,
+                      param_x_text = default_param_x_text,
+                      param_v_text = default_param_v_text):
     '''Given an ASE molecule, save an XTB wavefunction to the given directory,
     computed using xtb4stda'''
 
