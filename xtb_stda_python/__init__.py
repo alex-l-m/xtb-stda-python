@@ -6,6 +6,7 @@ from os import mkdir, rmdir, remove, replace, environ
 from os.path import join, isfile
 from subprocess import run
 from shutil import copy
+from concurrent.futures import ProcessPoolExecutor
 from ase.io import write
 
 # Files that xtb can create that I may have to remove in the cleanup step
@@ -159,3 +160,18 @@ def mol2energy(mol,
 
     # Energy
     return log2energy(stda_log)
+
+def mols2energy(mols,
+               # xtb4stda arguments
+               param_x_text = default_param_x_text,
+               param_v_text = default_param_v_text,
+               # stda arguments
+               triplet = False):
+    '''Given a list of ASE molecules, run xtb-stda on them in parallel, and
+    return a list of excitation energies'''
+    closure = lambda mol: mol2energy(mol, nthreads = 1, param_x_text =
+                                     param_x_text, param_v_text = param_v_text,
+                                     triplet = triplet)
+    with ProcessPoolExecutor() as pool:
+        energies = pool.map(closure, mols)
+    return energies
