@@ -51,8 +51,8 @@ def save_wavefunction(mol, outpath,
     # Set environment variables
     env = environ.copy()
     if nthreads is not None:
-        env["OMP_NUM_THREADS"] = nthreads
-        env["MKL_NUM_THREADS"] = nthreads
+        env["OMP_NUM_THREADS"] = str(nthreads)
+        env["MKL_NUM_THREADS"] = str(nthreads)
     # Set working directory to target folder and run
     run(["xtb4stda", "mol.xyz", "-parx", "param_x.xtb", "-parv", "param_v.xtb"],
         cwd = temp_dir_name, check = True, env = env)
@@ -97,8 +97,8 @@ def wavefunction_stda(xtb_path, dat_path = None, triplet = False, nthreads = Non
     # Set environment variables
     env = environ.copy()
     if nthreads is not None:
-        env["OMP_NUM_THREADS"] = nthreads
-        env["MKL_NUM_THREADS"] = nthreads
+        env["OMP_NUM_THREADS"] = str(nthreads)
+        env["MKL_NUM_THREADS"] = str(nthreads)
 
     # Run stda
     stda_run = run(["stda", "-xtb"] + extra_flags, capture_output = True, cwd =
