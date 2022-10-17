@@ -138,3 +138,24 @@ def log2energy(stda_log):
         energy_match = re.match(match_string, line)
         if right_part and energy_match is not None:
             return float(energy_match.group(1))
+
+def mol2energy(mol,
+               # xtb4stda arguments
+               param_x_text = default_param_x_text,
+               param_v_text = default_param_v_text,
+               nthreads = None,
+               # stda arguments
+               triplet = False):
+    '''Convenience wrapper function that does xtb, stda, and extracts an energy
+    from an ASE molecule, returning the energy in eV as a float'''
+    # Name of temporary wavefunction file
+    temp_file_name = "tmp_wfn_" + "".join(choices(ascii_letters, k = 80)) + ".xtb"
+    save_wavefunction(mol, temp_file_name, param_x_text = param_x_text,
+                      param_v_text = param_v_text, nthreads = nthreads)
+
+    # Log from stda
+    stda_log = wavefunction_stda(temp_file_name, triplet = triplet)
+    remove(temp_file_name)
+
+    # Energy
+    return log2energy(stda_log)
