@@ -74,7 +74,8 @@ def save_wavefunction(mol, outpath,
     # should be no error from rmdir
     rmdir(temp_dir_name)
 
-def wavefunction_stda(xtb_path, dat_path = None, triplet = False, nthreads = None):
+def wavefunction_stda(xtb_path, dat_path = None, triplet = False, nthreads =
+                      None, energy_threshold = None):
     '''Given a path to an XTB wavefunction created by xtb4stda, run stda and
     return the output as a string'''
 
@@ -93,6 +94,9 @@ def wavefunction_stda(xtb_path, dat_path = None, triplet = False, nthreads = Non
     extra_flags = []
     if triplet:
         extra_flags.append("-t")
+    if energy_threshold is not None:
+        extra_flags.append("-e")
+        extra_flags.append(str(energy_threshold))
 
     # Set environment variables
     env = environ.copy()
@@ -146,7 +150,8 @@ def mol2energy(mol,
                param_v_text = default_param_v_text,
                nthreads = None,
                # stda arguments
-               triplet = False):
+               triplet = False,
+               energy_threshold = None):
     '''Convenience wrapper function that does xtb, stda, and extracts an energy
     from an ASE molecule, returning the energy in eV as a float'''
     # Name of temporary wavefunction file
@@ -155,7 +160,8 @@ def mol2energy(mol,
                       param_v_text = param_v_text, nthreads = nthreads)
 
     # Log from stda
-    stda_log = wavefunction_stda(temp_file_name, triplet = triplet)
+    stda_log = wavefunction_stda(temp_file_name, triplet = triplet,
+                                 energy_threshold = energy_threshold)
     remove(temp_file_name)
 
     # Energy
@@ -167,27 +173,32 @@ class Mol2EnergyClosure:
                param_x_text = default_param_x_text,
                param_v_text = default_param_v_text,
                # stda arguments
-               triplet = False):
+               triplet = False,
+               energy_threshold = None):
         self.param_x_text = param_x_text
         self.param_v_text = param_v_text
         self.triplet = triplet
+        self.energy_threshold = energy_threshold
     
     def __call__(self, mol):
         return mol2energy(mol, param_x_text = self.param_x_text, param_v_text =
-        self.param_v_text, triplet = self.triplet, nthreads = 1)
+                          self.param_v_text, triplet = self.triplet, nthreads =
+                          1, energy_threshold = self.energy_threshold)
 
 def mols2energy(mols,
                # xtb4stda arguments
                param_x_text = default_param_x_text,
                param_v_text = default_param_v_text,
                # stda arguments
-               triplet = False):
+               triplet = False,
+               energy_threshold = None):
     '''Given a list of ASE molecules, run xtb-stda on them in parallel, and
     return a list of excitation energies'''
     closure = Mol2EnergyClosure(
                param_x_text = param_x_text,
                param_v_text = param_v_text,
-               triplet = triplet)
+               triplet = triplet,
+               energy_threshold = energy_threshold)
     with ProcessPoolExecutor() as pool:
         # Without calling "list", I get a generator
         energies = list(pool.map(closure, mols))
