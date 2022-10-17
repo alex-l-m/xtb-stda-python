@@ -173,5 +173,6 @@ def mols2energy(mols,
                                      param_x_text, param_v_text = param_v_text,
                                      triplet = triplet)
     with ProcessPoolExecutor() as pool:
-        energies = pool.map(closure, mols)
+        # Without calling "list", I get a generator
+        energies = list(pool.map(closure, mols))
     return energies
