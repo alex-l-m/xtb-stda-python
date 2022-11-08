@@ -171,7 +171,8 @@ def mol2energy(mol,
 
     # Log from stda
     stda_log = wavefunction_stda(temp_file_name, triplet = triplet,
-                                 energy_threshold = energy_threshold)
+                                 energy_threshold = energy_threshold,
+                                 nthreads = nthreads)
     remove(temp_file_name)
 
     # Energy
